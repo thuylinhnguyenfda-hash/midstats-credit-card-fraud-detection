@@ -14,9 +14,8 @@ The layout follows the provided Stock_META_Thien sample:
 3. Compare the models
 4. Conclusions
 
-[Open the current review notebook in Colab](https://colab.research.google.com/drive/125VXyel4u8uoJW-5VJ9eCOM-D8O0_N5m)
+[Open the current review notebook in Colab]([https://colab.research.google.com/drive/125VXyel4u8uoJW-5VJ9eCOM-D8O0_N5m](https://colab.research.google.com/drive/1V-CkMfJm2Il9-eJhni-n1nrAPncW5XWe))
 
-This link points to the Drive review version. After the group creates its repository, replace or supplement it with the repository-specific Open in Colab link. No GitHub URL is invented in this review package.
 
 ## Reproduce locally
 
