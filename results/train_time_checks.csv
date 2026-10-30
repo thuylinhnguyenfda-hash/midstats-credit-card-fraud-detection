@@ -1,0 +1,8 @@
+,0
+invalid_dob,0
+birth_after_transaction,0
+hour_mismatch,5263122
+seconds_mismatch,5491294
+weekday_mismatch_monday0,0
+weekend_mismatch,5491362
+night_mismatch_assuming_22_to_5,5491362

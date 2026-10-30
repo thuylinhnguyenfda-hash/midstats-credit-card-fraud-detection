@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "elapsed_seconds": 94.1,
+  "peak_child_rss_gib": 6.93,
+  "code_cells": 85,
+  "errors": [],
+  "final_test_evaluated": false,
+  "execution": "Real CSV; native local configuration; only dependency-install cell skipped because packages were preinstalled.",
+  "eda_scope": "train_only",
+  "raw_columns_reviewed": 44,
+  "all_numeric_counts_equal_train_n": true,
+  "prior_split_membership_preserved_label_blind": true,
+  "model_features": 59,
+  "train_fit_rows": 5491362,
+  "old_full_dataset_eda_inputs_absent": true,
+  "model_cells_verbatim": 16,
+  "model_cells_total": 21,
+  "real_test_evaluated": false,
+  "synthetic_test_gate_smoke_passed": true,
+  "figures": 17,
+  "raw_source_sha256": "526bd4d8bd2e217137996e19a0ca2c07b308773c882b714459f47ed82881e066",
+  "git_push_performed": false
+}

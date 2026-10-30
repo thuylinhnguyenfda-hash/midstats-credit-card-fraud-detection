@@ -1,0 +1,45 @@
+column,group,description,unit_or_encoding,dtype,missing,unique,missing_pct
+ssn,Identifiers,Customer identifier; exact semantics unverified,identifier,category,0,9460,0.0
+cc_num,Identifiers,Payment card identifier; preserve precision,identifier,category,0,9460,0.0
+first,Identifiers,Given name,text,category,0,660,0.0
+last,Identifiers,Family name,text,category,0,984,0.0
+gender,Customer,Recorded gender; source definitions unverified,source codes,category,0,2,0.0
+street,Identifiers,Street address,text,category,0,9460,0.0
+city,Customer,Customer city,text,category,0,3585,0.0
+state,Customer,Recorded state/region,source codes,category,0,51,0.0
+zip,Identifiers,Postal code; raw leading zeros may already be absent,postal code,category,0,6572,0.0
+lat,Customer,"Customer latitude, interpreted from column name",degrees,double[pyarrow],0,6434,0.0
+long,Customer,"Customer longitude, interpreted from column name",degrees,double[pyarrow],0,6498,0.0
+city_pop,Customer,City population; reference date unknown,people,int64[pyarrow],0,4226,0.0
+job,Customer,Occupation; high cardinality and source-dependent,text,category,0,639,0.0
+dob,Customer,Birth date; derive age at the event date,YYYY-MM-DD,string[pyarrow],0,7821,0.0
+acct_num,Identifiers,Account identifier,identifier,category,0,9460,0.0
+profile,Customer,Profile code; provenance unverified,filename/code,category,0,12,0.0
+trans_num,Identifiers,Transaction key used for integrity checks and split tie-breaking,identifier,string,0,5491362,0.0
+trans_date,Transaction,Source event date; timezone unverified,YYYY-MM-DD,string[pyarrow],0,223,0.0
+trans_time,Transaction,Source event clock time; timezone unverified,HH:MM:SS,string[pyarrow],0,86400,0.0
+unix_time,Transaction,Epoch timestamp; compare with source clock time,seconds since epoch,int64[pyarrow],0,4362728,0.0
+category,Transaction,Transaction category,source codes,category,0,14,0.0
+amt,Transaction,Transaction amount; preserve large positive values,currency unspecified,double[pyarrow],0,101706,0.0
+is_fraud,Transaction,Prediction target,"0=non-fraud, 1=fraud",int64[pyarrow],0,2,0.0
+merchant,Merchant,Merchant name; not a reliable unique merchant ID,text,category,0,693,0.0
+merch_lat,Merchant,Merchant latitude,degrees,double[pyarrow],0,4692694,0.0
+merch_long,Merchant,Merchant longitude,degrees,double[pyarrow],0,5117439,0.0
+customer_num_trans_1_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count,int64[pyarrow],0,7,0.0
+customer_num_trans_7_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count,int64[pyarrow],0,12,0.0
+customer_num_trans_30_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count,int64[pyarrow],0,17,0.0
+trans_time_secs,Supplied time features,Precomputed time field; verify against source time,seconds from midnight,int64[pyarrow],0,86399,0.0
+trans_time_hrs,Supplied time features,Precomputed hour; verify against source time,hour 0–23,int64[pyarrow],0,24,0.0
+trans_time_is_night,Supplied time features,Supplied night flag; source rule unknown,source rule unknown,int64[pyarrow],0,2,0.0
+trans_time_day,Supplied time features,Precomputed weekday,"Monday=0 to Sunday=6, checked",int64[pyarrow],0,7,0.0
+trans_date_is_weekend,Supplied time features,Precomputed weekend flag,0/1,int64[pyarrow],0,2,0.0
+customer_avg_amout_1_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified,double[pyarrow],0,8901,0.0
+customer_avg_amount_7_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified,double[pyarrow],0,8901,0.0
+customer_avg_amount_30_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified,double[pyarrow],0,6901,0.0
+merchant_num_trans_1_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count,double[pyarrow],0,489996,0.0
+merchant_num_trans_7_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count,double[pyarrow],0,4215470,0.0
+merchant_num_trans_30_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count,double[pyarrow],0,5355378,0.0
+merchant_risk_1_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score,int64[pyarrow],0,8,0.0
+merchant_risk_7_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score,int64[pyarrow],0,16,0.0
+merchant_risk_30_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score,int64[pyarrow],0,24,0.0
+merchant_risk_90_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score,int64[pyarrow],0,51,0.0

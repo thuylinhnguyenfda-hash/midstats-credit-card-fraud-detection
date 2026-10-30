@@ -1,0 +1,17 @@
+{
+  "eda_scope": "train_only",
+  "final_test_evaluated": false,
+  "source_sha256": "526bd4d8bd2e217137996e19a0ca2c07b308773c882b714459f47ed82881e066",
+  "split_sizes": {
+    "train": 5491362,
+    "validation": 1372841,
+    "test": 1716052
+  },
+  "versions": {
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "lightgbm": "4.7.0"
+  }
+}

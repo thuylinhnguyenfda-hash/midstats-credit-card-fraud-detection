@@ -1,0 +1,45 @@
+column,group,description,unit_or_encoding
+ssn,Identifiers,Customer identifier; exact semantics unverified,identifier
+cc_num,Identifiers,Payment card identifier; preserve precision,identifier
+first,Identifiers,Given name,text
+last,Identifiers,Family name,text
+gender,Customer,Recorded gender; source definitions unverified,source codes
+street,Identifiers,Street address,text
+city,Customer,Customer city,text
+state,Customer,Recorded state/region,source codes
+zip,Identifiers,Postal code; raw leading zeros may already be absent,postal code
+lat,Customer,"Customer latitude, interpreted from column name",degrees
+long,Customer,"Customer longitude, interpreted from column name",degrees
+city_pop,Customer,City population; reference date unknown,people
+job,Customer,Occupation; high cardinality and source-dependent,text
+dob,Customer,Birth date; derive age at the event date,YYYY-MM-DD
+acct_num,Identifiers,Account identifier,identifier
+profile,Customer,Profile code; provenance unverified,filename/code
+trans_num,Identifiers,Transaction key used for integrity checks and split tie-breaking,identifier
+trans_date,Transaction,Source event date; timezone unverified,YYYY-MM-DD
+trans_time,Transaction,Source event clock time; timezone unverified,HH:MM:SS
+unix_time,Transaction,Epoch timestamp; compare with source clock time,seconds since epoch
+category,Transaction,Transaction category,source codes
+amt,Transaction,Transaction amount; preserve large positive values,currency unspecified
+is_fraud,Transaction,Prediction target,"0=non-fraud, 1=fraud"
+merchant,Merchant,Merchant name; not a reliable unique merchant ID,text
+merch_lat,Merchant,Merchant latitude,degrees
+merch_long,Merchant,Merchant longitude,degrees
+customer_num_trans_1_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count
+customer_num_trans_7_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count
+customer_num_trans_30_day,Customer history,Historical transaction count suggested by name; verify fractional values,claimed count
+trans_time_secs,Supplied time features,Precomputed time field; verify against source time,seconds from midnight
+trans_time_hrs,Supplied time features,Precomputed hour; verify against source time,hour 0–23
+trans_time_is_night,Supplied time features,Supplied night flag; source rule unknown,source rule unknown
+trans_time_day,Supplied time features,Precomputed weekday,"Monday=0 to Sunday=6, checked"
+trans_date_is_weekend,Supplied time features,Precomputed weekend flag,0/1
+customer_avg_amout_1_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified
+customer_avg_amount_7_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified
+customer_avg_amount_30_day,Customer history,Historical average amount; aggregation definition unverified,currency unspecified
+merchant_num_trans_1_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count
+merchant_num_trans_7_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count
+merchant_num_trans_30_day,Merchant history,Historical transaction count suggested by name; verify fractional values,claimed count
+merchant_risk_1_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score
+merchant_risk_7_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score
+merchant_risk_30_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score
+merchant_risk_90_day,Merchant history,Merchant historical risk; formula and label availability unverified,unknown score

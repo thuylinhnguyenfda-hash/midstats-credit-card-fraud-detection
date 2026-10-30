@@ -1,0 +1,7 @@
+,fractional_rows,percent_of_train
+customer_num_trans_1_day,0,0.0
+customer_num_trans_7_day,0,0.0
+customer_num_trans_30_day,0,0.0
+merchant_num_trans_1_day,5436126,98.99412932529307
+merchant_num_trans_7_day,5436535,99.00157738644802
+merchant_num_trans_30_day,5436672,99.00407221377866

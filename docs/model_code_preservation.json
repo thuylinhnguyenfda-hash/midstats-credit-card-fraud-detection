@@ -1,0 +1,166 @@
+{
+  "source": "Latest_Before_Publish.ipynb — group-approved newer LightGBM configuration",
+  "model_cells": [
+    {
+      "source_cell_index": 116,
+      "cell_id": "c7bd9681",
+      "unchanged": true,
+      "before": "warnings.filterwarnings('ignore', category=UserWarning, module='lightgbm')\nplt.rcParams.update({'figure.dpi': 110, 'axes.spines.top': False, 'axes.spines.right': False,\n                     'axes.grid': True, 'grid.alpha': .25})\n\nD = output\nFEATURES = json.load(open(D / 'feature_schema.json'))['features']\nprint(f'Số feature: {len(FEATURES)}')",
+      "after": "warnings.filterwarnings('ignore', category=UserWarning, module='lightgbm')\nplt.rcParams.update({'figure.dpi': 110, 'axes.spines.top': False, 'axes.spines.right': False,\n                     'axes.grid': True, 'grid.alpha': .25})\n\nD = output\nFEATURES = json.load(open(D / 'feature_schema.json'))['features']\nprint(f'Số feature: {len(FEATURES)}')"
+    },
+    {
+      "source_cell_index": 117,
+      "cell_id": "ea036992",
+      "unchanged": true,
+      "before": "RESULTS = {}\n\ndef load(split):\n    df = pd.read_parquet(D / f'{split}_ready.parquet')\n    y = df.pop('is_fraud').to_numpy(np.int8)\n    assert df.columns.tolist() == FEATURES\n    X = df.to_numpy(np.float32)\n    del df; gc.collect()\n    return X, y\n\ndef evaluate(name, y, p, thr=None):\n    prec, rec, ths = precision_recall_curve(y, p)\n    ap = -np.sum(np.diff(rec) * prec[:-1])                       # PR-AUC\n    if thr is None:                                              # chọn ngưỡng tối ưu F1 (chỉ trên validation)\n        f1s = 2 * prec[:-1] * rec[:-1] / (prec[:-1] + rec[:-1] + 1e-12)\n        thr = ths[f1s.argmax()]\n    pred = p >= thr\n    tp = int((pred & (y == 1)).sum()); fp = int((pred & (y == 0)).sum()); fn = int((~pred & (y == 1)).sum())\n    tn = len(y) - tp - fp - fn\n    pr, rc = tp / max(tp + fp, 1), tp / max(tp + fn, 1)\n    f1, roc = 2 * pr * rc / max(pr + rc, 1e-12), roc_auc_score(y, p)\n    RESULTS[name] = {'PR-AUC': ap, 'ROC-AUC': roc, 'Precision': pr, 'Recall': rc, 'F1': f1,\n                     'Ngưỡng': thr, 'TP': tp, 'FP': fp, 'FN': fn, 'TN': tn}\n\n    print(f\"\\n{'═' * 12} {name} {'═' * 12}\")\n    print(f\"ROC-AUC {roc:.4f} | PR-AUC {ap:.4f} | Ngưỡng {thr:.4f}\")\n    print(f\"Precision {pr:.4f} | Recall {rc:.4f} | F1 {f1:.4f}\")\n    print(f\"\\n{'':<16}{'Dự đoán: thường':>18}{'Dự đoán: fraud':>18}\")\n    print(f\"{'Thực tế: thường':<16}{tn:>18,}{fp:>18,}\")\n    print(f\"{'Thực tế: fraud':<16}{fn:>18,}{tp:>18,}\")\n    print(f\"\\n=> Bắt được {tp:,}/{tp + fn:,} giao dịch fraud ({rc:.1%}), \"\n          f\"kèm {fp:,} cảnh báo sai trên {tn + fp:,} giao dịch thường ({fp / (tn + fp):.2%}).\")\n    return thr, ap",
+      "after": "RESULTS = {}\n\ndef load(split):\n    df = pd.read_parquet(D / f'{split}_ready.parquet')\n    y = df.pop('is_fraud').to_numpy(np.int8)\n    assert df.columns.tolist() == FEATURES\n    X = df.to_numpy(np.float32)\n    del df; gc.collect()\n    return X, y\n\ndef evaluate(name, y, p, thr=None):\n    prec, rec, ths = precision_recall_curve(y, p)\n    ap = -np.sum(np.diff(rec) * prec[:-1])                       # PR-AUC\n    if thr is None:                                              # chọn ngưỡng tối ưu F1 (chỉ trên validation)\n        f1s = 2 * prec[:-1] * rec[:-1] / (prec[:-1] + rec[:-1] + 1e-12)\n        thr = ths[f1s.argmax()]\n    pred = p >= thr\n    tp = int((pred & (y == 1)).sum()); fp = int((pred & (y == 0)).sum()); fn = int((~pred & (y == 1)).sum())\n    tn = len(y) - tp - fp - fn\n    pr, rc = tp / max(tp + fp, 1), tp / max(tp + fn, 1)\n    f1, roc = 2 * pr * rc / max(pr + rc, 1e-12), roc_auc_score(y, p)\n    RESULTS[name] = {'PR-AUC': ap, 'ROC-AUC': roc, 'Precision': pr, 'Recall': rc, 'F1': f1,\n                     'Ngưỡng': thr, 'TP': tp, 'FP': fp, 'FN': fn, 'TN': tn}\n\n    print(f\"\\n{'═' * 12} {name} {'═' * 12}\")\n    print(f\"ROC-AUC {roc:.4f} | PR-AUC {ap:.4f} | Ngưỡng {thr:.4f}\")\n    print(f\"Precision {pr:.4f} | Recall {rc:.4f} | F1 {f1:.4f}\")\n    print(f\"\\n{'':<16}{'Dự đoán: thường':>18}{'Dự đoán: fraud':>18}\")\n    print(f\"{'Thực tế: thường':<16}{tn:>18,}{fp:>18,}\")\n    print(f\"{'Thực tế: fraud':<16}{fn:>18,}{tp:>18,}\")\n    print(f\"\\n=> Bắt được {tp:,}/{tp + fn:,} giao dịch fraud ({rc:.1%}), \"\n          f\"kèm {fp:,} cảnh báo sai trên {tn + fp:,} giao dịch thường ({fp / (tn + fp):.2%}).\")\n    return thr, ap"
+    },
+    {
+      "source_cell_index": 118,
+      "cell_id": "b6705b9c",
+      "unchanged": true,
+      "before": "X_tr, y_tr = load('train')\nX_va, y_va = load('validation')\n\noverview = pd.DataFrame({'Số dòng': [len(y_tr), len(y_va)], 'Số fraud': [int(y_tr.sum()), int(y_va.sum())],\n                         'Tỷ lệ fraud (%)': [y_tr.mean() * 100, y_va.mean() * 100],\n                         'Số feature': [X_tr.shape[1]] * 2}, index=['Train', 'Validation'])\ndisplay(overview.style.format({'Số dòng': '{:,}', 'Số fraud': '{:,}', 'Tỷ lệ fraud (%)': '{:.2f}'}))",
+      "after": "X_tr, y_tr = load('train')\nX_va, y_va = load('validation')\n\noverview = pd.DataFrame({'Số dòng': [len(y_tr), len(y_va)], 'Số fraud': [int(y_tr.sum()), int(y_va.sum())],\n                         'Tỷ lệ fraud (%)': [y_tr.mean() * 100, y_va.mean() * 100],\n                         'Số feature': [X_tr.shape[1]] * 2}, index=['Train', 'Validation'])\ndisplay(overview.style.format({'Số dòng': '{:,}', 'Số fraud': '{:,}', 'Tỷ lệ fraud (%)': '{:.2f}'}))"
+    },
+    {
+      "source_cell_index": 120,
+      "cell_id": "3e2fdc1b",
+      "unchanged": true,
+      "before": "t0 = time.time()\nlr = SGDClassifier(loss='log_loss', alpha=1e-4, class_weight='balanced',\n                   max_iter=15, tol=1e-3, random_state=42).fit(X_tr, y_tr)\nprint(f'Thời gian train: {time.time() - t0:.1f}s')\nthr_lr, _ = evaluate('LR · Validation', y_va, lr.predict_proba(X_va)[:, 1])",
+      "after": "t0 = time.time()\nlr = SGDClassifier(loss='log_loss', alpha=1e-4, class_weight='balanced',\n                   max_iter=15, tol=1e-3, random_state=42).fit(X_tr, y_tr)\nprint(f'Thời gian train: {time.time() - t0:.1f}s')\nthr_lr, _ = evaluate('LR · Validation', y_va, lr.predict_proba(X_va)[:, 1])"
+    },
+    {
+      "source_cell_index": 122,
+      "cell_id": "5080bad7",
+      "unchanged": false,
+      "before": "start_time = time.perf_counter()\n\n# Use a moderate number of CPU threads.\n# Change to 4 or 8 after benchmarking your machine.\nN_THREADS = 4\n\nlgb_params = {\n    \"objective\": \"binary\",\n    \"metric\": \"average_precision\",\n    \"boosting_type\": \"gbdt\",\n    \"learning_rate\": 0.1,\n    \"num_leaves\": 31,\n    \"max_depth\": -1,\n    \"min_data_in_leaf\": 300,\n    \"max_bin\": 63,\n    \"feature_fraction\": 0.8,\n    \"bagging_freq\": 1,\n    \"pos_bagging_fraction\": 1.0,\n    \"neg_bagging_fraction\": 0.5,\n    \"lambda_l2\": 1.0,\n    \"force_row_wise\": True,\n    \"num_threads\": N_THREADS,\n    \"verbosity\": -1,\n    \"seed\": 42,\n    \"feature_fraction_seed\": 42,\n    \"bagging_seed\": 42,\n    \"data_random_seed\": 42\n}\n\n# Reuse the prepared NumPy arrays.\ndtrain = lgb.Dataset(\n    X_tr,\n    label=y_tr,\n    feature_name=FEATURES,\n    params={\"max_bin\": 63},\n    free_raw_data=True\n)\n\ndval = lgb.Dataset(\n    X_va,\n    label=y_va,\n    reference=dtrain,\n    params={\"max_bin\": 63},\n    free_raw_data=True\n)\n\nbooster = lgb.train(\n    params=lgb_params,\n    train_set=dtrain,\n    num_boost_round=800,\n    valid_sets=[dval],\n    valid_names=[\"validation\"],\n    callbacks=[\n        lgb.early_stopping(\n            stopping_rounds=50,\n            first_metric_only=True,\n            verbose=False\n        ),\n        lgb.log_evaluation(period=100)\n    ]\n)\n\nbest_iteration = booster.best_iteration\n\nval_scores_gb = booster.predict(\n    X_va,\n    num_iteration=best_iteration\n)\n\nelapsed = time.perf_counter() - start_time\n\nprint(f\"Training time: {elapsed:.1f} seconds\")\nprint(f\"Best iteration: {best_iteration}\")\nprint(f\"Number of features: {len(FEATURES)}\")\nprint(f\"Validation predictions: {len(val_scores_gb):,}\")\n",
+      "after": "start_time = time.perf_counter()\n\n# Use a moderate number of CPU threads.\n# Change to 4 or 8 after benchmarking your machine.\nN_THREADS = 4\n\nlgb_params = {\n    \"objective\": \"binary\",\n    \"metric\": \"average_precision\",\n    \"boosting_type\": \"gbdt\",\n    \"learning_rate\": 0.1,\n    \"num_leaves\": 31,\n    \"max_depth\": -1,\n    \"min_data_in_leaf\": 300,\n    \"max_bin\": 63,\n    \"feature_fraction\": 0.8,\n    \"bagging_freq\": 1,\n    \"pos_bagging_fraction\": 1.0,\n    \"neg_bagging_fraction\": 0.5,\n    \"lambda_l2\": 1.0,\n    \"force_row_wise\": True,\n    \"num_threads\": N_THREADS,\n    \"verbosity\": -1,\n    \"seed\": 42,\n    \"feature_fraction_seed\": 42,\n    \"bagging_seed\": 42,\n    \"data_random_seed\": 42\n}\n\n# Reuse the prepared NumPy arrays.\ndtrain = lgb.Dataset(\n    X_tr,\n    label=y_tr,\n    feature_name=FEATURES,\n    params={\"max_bin\": 63},\n    free_raw_data=True\n)\n\ndval = lgb.Dataset(\n    X_va,\n    label=y_va,\n    reference=dtrain,\n    params={\"max_bin\": 63},\n    free_raw_data=True\n)\n\nbooster = lgb.train(\n    params=lgb_params,\n    train_set=dtrain,\n    num_boost_round=800,\n    valid_sets=[dval],\n    valid_names=[\"validation\"],\n    callbacks=[\n        lgb.early_stopping(\n            stopping_rounds=50,\n            first_metric_only=True,\n            verbose=False\n        ),\n        lgb.log_evaluation(period=100)\n    ]\n)\n\nbest_iteration = booster.best_iteration\n\nval_scores_gb = booster.predict(\n    X_va,\n    num_iteration=best_iteration\n)\n\nelapsed = time.perf_counter() - start_time\n\nprint(f\"Training time: {elapsed:.1f} seconds\")\nprint(f\"Best iteration: {best_iteration}\")\nprint(f\"Number of features: {len(FEATURES)}\")\nprint(f\"Validation predictions: {len(val_scores_gb):,}\")\n\nthr_gb, _ = evaluate('LightGBM · Validation', y_va, val_scores_gb)\ndel X_tr, y_tr\ngc.collect()\n",
+      "change_type": "append_evaluate_and_cleanup"
+    },
+    {
+      "source_cell_index": 124,
+      "cell_id": "BaeO54PHV5DN",
+      "unchanged": true,
+      "before": "required_files = [\n    'train_ready.parquet',\n    'validation_ready.parquet',\n    'train_row_index.parquet',\n    'feature_schema.json'\n]\n\nfor name in required_files:\n    path = D / name\n    print(name, '->', path.exists())\n    assert path.exists(), f'Thiếu file: {path}'",
+      "after": "required_files = [\n    'train_ready.parquet',\n    'validation_ready.parquet',\n    'train_row_index.parquet',\n    'feature_schema.json'\n]\n\nfor name in required_files:\n    path = D / name\n    print(name, '->', path.exists())\n    assert path.exists(), f'Thiếu file: {path}'"
+    },
+    {
+      "source_cell_index": 125,
+      "cell_id": "DzqRWaYdV5DN",
+      "unchanged": true,
+      "before": "X_train, y_train = load('train')\n\nprint(f'Train: {len(y_train):,} dòng | fraud: {int(y_train.sum()):,} ({y_train.mean():.2%})')\nprint(f'Validation: {len(y_va):,} dòng | fraud: {int(y_va.sum()):,} ({y_va.mean():.2%})')\nprint(f'Số feature: {X_train.shape[1]}')",
+      "after": "X_train, y_train = load('train')\n\nprint(f'Train: {len(y_train):,} dòng | fraud: {int(y_train.sum()):,} ({y_train.mean():.2%})')\nprint(f'Validation: {len(y_va):,} dòng | fraud: {int(y_va.sum()):,} ({y_va.mean():.2%})')\nprint(f'Số feature: {X_train.shape[1]}')"
+    },
+    {
+      "source_cell_index": 126,
+      "cell_id": "fJmzab3jV5DN",
+      "unchanged": true,
+      "before": "# Giới hạn phần CV để phù hợp bộ nhớ và thời gian chạy trên Colab.\nn_cv = min(300_000, len(y_train))\nX_cv = X_train[-n_cv:]\ny_cv = y_train[-n_cv:]\n\ntemp = pd.read_parquet(D / 'train_row_index.parquet', columns=['datetime'])\ntrain_times = pd.to_datetime(temp['datetime']).to_numpy()\ndel temp\ngc.collect()\n\nassert len(train_times) == len(y_train)\nassert pd.Series(train_times).is_monotonic_increasing\n\ntimes_cv = train_times[-n_cv:]\nunique_times = np.unique(times_cv)\nsplitter = TimeSeriesSplit(n_splits=3)\ncv_splits = []\n\nfor fold, (train_time_idx, valid_time_idx) in enumerate(splitter.split(unique_times), start=1):\n    train_end = unique_times[train_time_idx[-1]]\n    valid_start = unique_times[valid_time_idx[0]]\n    valid_end = unique_times[valid_time_idx[-1]]\n\n    train_idx = np.flatnonzero(times_cv <= train_end)\n    valid_idx = np.flatnonzero((times_cv >= valid_start) & (times_cv <= valid_end))\n\n    assert times_cv[train_idx].max() < times_cv[valid_idx].min()\n    cv_splits.append((train_idx, valid_idx))\n\n    print(\n        f'Fold {fold}: train={len(train_idx):,}, fraud={int(y_cv[train_idx].sum()):,}; '\n        f'CV={len(valid_idx):,}, fraud={int(y_cv[valid_idx].sum()):,}'\n    )\n\ndel train_times, times_cv, unique_times, splitter\ngc.collect()",
+      "after": "# Giới hạn phần CV để phù hợp bộ nhớ và thời gian chạy trên Colab.\nn_cv = min(300_000, len(y_train))\nX_cv = X_train[-n_cv:]\ny_cv = y_train[-n_cv:]\n\ntemp = pd.read_parquet(D / 'train_row_index.parquet', columns=['datetime'])\ntrain_times = pd.to_datetime(temp['datetime']).to_numpy()\ndel temp\ngc.collect()\n\nassert len(train_times) == len(y_train)\nassert pd.Series(train_times).is_monotonic_increasing\n\ntimes_cv = train_times[-n_cv:]\nunique_times = np.unique(times_cv)\nsplitter = TimeSeriesSplit(n_splits=3)\ncv_splits = []\n\nfor fold, (train_time_idx, valid_time_idx) in enumerate(splitter.split(unique_times), start=1):\n    train_end = unique_times[train_time_idx[-1]]\n    valid_start = unique_times[valid_time_idx[0]]\n    valid_end = unique_times[valid_time_idx[-1]]\n\n    train_idx = np.flatnonzero(times_cv <= train_end)\n    valid_idx = np.flatnonzero((times_cv >= valid_start) & (times_cv <= valid_end))\n\n    assert times_cv[train_idx].max() < times_cv[valid_idx].min()\n    cv_splits.append((train_idx, valid_idx))\n\n    print(\n        f'Fold {fold}: train={len(train_idx):,}, fraud={int(y_cv[train_idx].sum()):,}; '\n        f'CV={len(valid_idx):,}, fraud={int(y_cv[valid_idx].sum()):,}'\n    )\n\ndel train_times, times_cv, unique_times, splitter\ngc.collect()"
+    },
+    {
+      "source_cell_index": 128,
+      "cell_id": "C8Q_4JUPV5DO",
+      "unchanged": true,
+      "before": "def get_rows(data, indices):\n    return data.iloc[indices] if hasattr(data, 'iloc') else data[indices]\n\ndef project_pr_auc(y_true, fraud_scores):\n    precision, recall, _ = precision_recall_curve(y_true, fraud_scores)\n    return -np.sum(np.diff(recall) * precision[:-1])\n\nbaseline_models = {\n    'Dummy': DummyClassifier(strategy='prior'),\n    'Logistic baseline': SGDClassifier(\n        loss='log_loss', alpha=1e-4, class_weight='balanced',\n        max_iter=100, tol=1e-3, random_state=42\n    )\n}\n\ny_cv_array = np.asarray(y_cv)\n\ndef run_cv(models, store):\n    for name, template in models.items():\n        scores = []\n        for fold, (train_idx, valid_idx) in enumerate(cv_splits, start=1):\n            model = clone(template)\n            model.fit(get_rows(X_cv, train_idx), y_cv_array[train_idx])\n            fraud_scores = model.predict_proba(get_rows(X_cv, valid_idx))[:, 1]\n            score = project_pr_auc(y_cv_array[valid_idx], fraud_scores)\n            scores.append(score)\n            print(f'{name} — Fold {fold}: PR-AUC = {score:.4f}')\n\n        store[name] = scores\n        print(f'{name} — Mean PR-AUC: {np.mean(scores):.4f} (Std: {np.std(scores):.4f})\\n')\n\nbaseline_results = {}\nrun_cv(baseline_models, baseline_results)",
+      "after": "def get_rows(data, indices):\n    return data.iloc[indices] if hasattr(data, 'iloc') else data[indices]\n\ndef project_pr_auc(y_true, fraud_scores):\n    precision, recall, _ = precision_recall_curve(y_true, fraud_scores)\n    return -np.sum(np.diff(recall) * precision[:-1])\n\nbaseline_models = {\n    'Dummy': DummyClassifier(strategy='prior'),\n    'Logistic baseline': SGDClassifier(\n        loss='log_loss', alpha=1e-4, class_weight='balanced',\n        max_iter=100, tol=1e-3, random_state=42\n    )\n}\n\ny_cv_array = np.asarray(y_cv)\n\ndef run_cv(models, store):\n    for name, template in models.items():\n        scores = []\n        for fold, (train_idx, valid_idx) in enumerate(cv_splits, start=1):\n            model = clone(template)\n            model.fit(get_rows(X_cv, train_idx), y_cv_array[train_idx])\n            fraud_scores = model.predict_proba(get_rows(X_cv, valid_idx))[:, 1]\n            score = project_pr_auc(y_cv_array[valid_idx], fraud_scores)\n            scores.append(score)\n            print(f'{name} — Fold {fold}: PR-AUC = {score:.4f}')\n\n        store[name] = scores\n        print(f'{name} — Mean PR-AUC: {np.mean(scores):.4f} (Std: {np.std(scores):.4f})\\n')\n\nbaseline_results = {}\nrun_cv(baseline_models, baseline_results)"
+    },
+    {
+      "source_cell_index": 129,
+      "cell_id": "ah_V7rAcV5DO",
+      "unchanged": true,
+      "before": "tree_candidates = {\n    'Decision Tree depth 6': DecisionTreeClassifier(\n        max_depth=6, min_samples_leaf=200,\n        class_weight='balanced', random_state=42\n    ),\n    'Decision Tree depth 10': DecisionTreeClassifier(\n        max_depth=10, min_samples_leaf=200,\n        class_weight='balanced', random_state=42\n    ),\n    'Random Forest depth 8': RandomForestClassifier(\n        n_estimators=20, max_depth=8, min_samples_leaf=200,\n        max_features='sqrt', class_weight='balanced_subsample',\n        n_jobs=2, random_state=42\n    ),\n    'Random Forest depth 12': RandomForestClassifier(\n        n_estimators=20, max_depth=12, min_samples_leaf=200,\n        max_features='sqrt', class_weight='balanced_subsample',\n        n_jobs=2, random_state=42\n    )\n}\n\ntree_results = {}\nrun_cv(tree_candidates, tree_results)",
+      "after": "tree_candidates = {\n    'Decision Tree depth 6': DecisionTreeClassifier(\n        max_depth=6, min_samples_leaf=200,\n        class_weight='balanced', random_state=42\n    ),\n    'Decision Tree depth 10': DecisionTreeClassifier(\n        max_depth=10, min_samples_leaf=200,\n        class_weight='balanced', random_state=42\n    ),\n    'Random Forest depth 8': RandomForestClassifier(\n        n_estimators=20, max_depth=8, min_samples_leaf=200,\n        max_features='sqrt', class_weight='balanced_subsample',\n        n_jobs=2, random_state=42\n    ),\n    'Random Forest depth 12': RandomForestClassifier(\n        n_estimators=20, max_depth=12, min_samples_leaf=200,\n        max_features='sqrt', class_weight='balanced_subsample',\n        n_jobs=2, random_state=42\n    )\n}\n\ntree_results = {}\nrun_cv(tree_candidates, tree_results)"
+    },
+    {
+      "source_cell_index": 131,
+      "cell_id": "JdgxOKTEV5DP",
+      "unchanged": true,
+      "before": "best_tree_name = max(tree_results, key=lambda name: np.mean(tree_results[name]))\nbest_tree = clone(tree_candidates[best_tree_name])\n\nprint(f'Cấu hình cây được chọn theo CV: {best_tree_name}')\nbest_tree.fit(X_train, y_train)\nval_scores = best_tree.predict_proba(X_va)[:, 1]\n\ntree_key = f'{best_tree_name} · Validation'\nbest_threshold, _ = evaluate(tree_key, y_va, val_scores)\nr = RESULTS[tree_key]\ncm = np.array([[r['TN'], r['FP']], [r['FN'], r['TP']]])",
+      "after": "best_tree_name = max(tree_results, key=lambda name: np.mean(tree_results[name]))\nbest_tree = clone(tree_candidates[best_tree_name])\n\nprint(f'Cấu hình cây được chọn theo CV: {best_tree_name}')\nbest_tree.fit(X_train, y_train)\nval_scores = best_tree.predict_proba(X_va)[:, 1]\n\ntree_key = f'{best_tree_name} · Validation'\nbest_threshold, _ = evaluate(tree_key, y_va, val_scores)\nr = RESULTS[tree_key]\ncm = np.array([[r['TN'], r['FP']], [r['FN'], r['TP']]])"
+    },
+    {
+      "source_cell_index": 133,
+      "cell_id": "XMny80qFV5DP",
+      "unchanged": true,
+      "before": "all_cv_results = {**baseline_results, **tree_results}\ncv_summary = pd.DataFrame([\n    {\n        'Model': name,\n        'Mean PR-AUC': np.mean(scores),\n        'Std PR-AUC': np.std(scores),\n        'Fold 1': scores[0],\n        'Fold 2': scores[1],\n        'Fold 3': scores[2]\n    }\n    for name, scores in all_cv_results.items()\n]).sort_values('Mean PR-AUC', ascending=False).reset_index(drop=True)\n\ndisplay(cv_summary.round(4))\n\nplt.figure(figsize=(10, 5))\nplt.bar(cv_summary['Model'], cv_summary['Mean PR-AUC'],\n        yerr=cv_summary['Std PR-AUC'], capsize=4, color='#4C78A8')\nplt.ylabel('Mean PR-AUC')\nplt.title('So sánh PR-AUC qua 3 fold theo thời gian')\nplt.xticks(rotation=25, ha='right')\nplt.tight_layout()\nplt.show()",
+      "after": "all_cv_results = {**baseline_results, **tree_results}\ncv_summary = pd.DataFrame([\n    {\n        'Model': name,\n        'Mean PR-AUC': np.mean(scores),\n        'Std PR-AUC': np.std(scores),\n        'Fold 1': scores[0],\n        'Fold 2': scores[1],\n        'Fold 3': scores[2]\n    }\n    for name, scores in all_cv_results.items()\n]).sort_values('Mean PR-AUC', ascending=False).reset_index(drop=True)\n\ndisplay(cv_summary.round(4))\n\nplt.figure(figsize=(10, 5))\nplt.bar(cv_summary['Model'], cv_summary['Mean PR-AUC'],\n        yerr=cv_summary['Std PR-AUC'], capsize=4, color='#4C78A8')\nplt.ylabel('Mean PR-AUC')\nplt.title('So sánh PR-AUC qua 3 fold theo thời gian')\nplt.xticks(rotation=25, ha='right')\nplt.tight_layout()\nplt.show()"
+    },
+    {
+      "source_cell_index": 135,
+      "cell_id": "jFfAPP6rV5DP",
+      "unchanged": true,
+      "before": "cols = ['PR-AUC', 'ROC-AUC', 'Precision', 'Recall', 'F1']\nsources = {\n    'Logistic Regression (02)': 'LR · Validation',\n    'LightGBM (02)': 'LightGBM · Validation',\n    best_tree_name: tree_key,\n}\ncomparison = pd.DataFrame({model: {c: RESULTS[key][c] for c in cols} for model, key in sources.items()}).T\ncomparison.index.name = 'Model'\n\ndisplay(comparison.round(4))\n\ncomparison['PR-AUC'].plot(kind='bar', figsize=(8, 4), color=['#4C78A8', '#F58518', '#54A24B'])\nplt.ylabel('Validation PR-AUC')\nplt.title('Mô hình so sánh trên cùng tập validation')\nplt.xticks(rotation=15, ha='right')\nplt.tight_layout()\nplt.show()",
+      "after": "cols = ['PR-AUC', 'ROC-AUC', 'Precision', 'Recall', 'F1']\nsources = {\n    'Logistic Regression (02)': 'LR · Validation',\n    'LightGBM (02)': 'LightGBM · Validation',\n    best_tree_name: tree_key,\n}\ncomparison = pd.DataFrame({model: {c: RESULTS[key][c] for c in cols} for model, key in sources.items()}).T\ncomparison.index.name = 'Model'\n\ndisplay(comparison.round(4))\n\ncomparison['PR-AUC'].plot(kind='bar', figsize=(8, 4), color=['#4C78A8', '#F58518', '#54A24B'])\nplt.ylabel('Validation PR-AUC')\nplt.title('Mô hình so sánh trên cùng tập validation')\nplt.xticks(rotation=15, ha='right')\nplt.tight_layout()\nplt.show()"
+    },
+    {
+      "source_cell_index": 137,
+      "cell_id": "-DXTSNyZaYh0",
+      "unchanged": true,
+      "before": "# Decision Tree có một cây; Random Forest gồm nhiều cây.\nif isinstance(best_tree, DecisionTreeClassifier):\n    tree_to_draw = best_tree\n    tree_title = best_tree_name\nelse:\n    tree_to_draw = best_tree.estimators_[0]\n    tree_title = f'{best_tree_name} — cây thành phần đầu tiên'\n\nplt.figure(figsize=(26, 12), dpi=140)\nplot_tree(\n    tree_to_draw,\n    feature_names=FEATURES,\n    class_names=['Không gian lận', 'Gian lận'],\n    filled=True,\n    rounded=True,\n    max_depth=3,\n    impurity=False,\n    proportion=True,\n    fontsize=8\n)\nplt.title(f'{tree_title} (ba tầng đầu)')\nplt.tight_layout()\nplt.show()",
+      "after": "# Decision Tree có một cây; Random Forest gồm nhiều cây.\nif isinstance(best_tree, DecisionTreeClassifier):\n    tree_to_draw = best_tree\n    tree_title = best_tree_name\nelse:\n    tree_to_draw = best_tree.estimators_[0]\n    tree_title = f'{best_tree_name} — cây thành phần đầu tiên'\n\nplt.figure(figsize=(26, 12), dpi=140)\nplot_tree(\n    tree_to_draw,\n    feature_names=FEATURES,\n    class_names=['Không gian lận', 'Gian lận'],\n    filled=True,\n    rounded=True,\n    max_depth=3,\n    impurity=False,\n    proportion=True,\n    fontsize=8\n)\nplt.title(f'{tree_title} (ba tầng đầu)')\nplt.tight_layout()\nplt.show()"
+    },
+    {
+      "source_cell_index": 138,
+      "cell_id": "mR69GBxFV5DP",
+      "unchanged": true,
+      "before": "fig, ax = plt.subplots(figsize=(5, 4))\nax.imshow(cm, cmap='Blues')\nax.set_xticks([0, 1], labels=['Dự đoán thường', 'Dự đoán fraud'])\nax.set_yticks([0, 1], labels=['Thực tế thường', 'Thực tế fraud'])\nax.set_title(f'Ma trận nhầm lẫn — {best_tree_name}')\nfor i in range(2):\n    for j in range(2):\n        ax.text(j, i, f'{cm[i, j]:,}', ha='center', va='center')\nplt.tight_layout()\nplt.show()\n\nimportance = pd.Series(best_tree.feature_importances_, index=FEATURES)\nimportance = importance.nlargest(10).sort_values()\nimportance.plot(kind='barh', figsize=(8, 5), color='#54A24B')\nplt.xlabel('Feature importance')\nplt.title(f'Top 10 feature — {best_tree_name}')\nplt.tight_layout()\nplt.show()",
+      "after": "fig, ax = plt.subplots(figsize=(5, 4))\nax.imshow(cm, cmap='Blues')\nax.set_xticks([0, 1], labels=['Dự đoán thường', 'Dự đoán fraud'])\nax.set_yticks([0, 1], labels=['Thực tế thường', 'Thực tế fraud'])\nax.set_title(f'Ma trận nhầm lẫn — {best_tree_name}')\nfor i in range(2):\n    for j in range(2):\n        ax.text(j, i, f'{cm[i, j]:,}', ha='center', va='center')\nplt.tight_layout()\nplt.show()\n\nimportance = pd.Series(best_tree.feature_importances_, index=FEATURES)\nimportance = importance.nlargest(10).sort_values()\nimportance.plot(kind='barh', figsize=(8, 5), color='#54A24B')\nplt.xlabel('Feature importance')\nplt.title(f'Top 10 feature — {best_tree_name}')\nplt.tight_layout()\nplt.show()"
+    },
+    {
+      "source_cell_index": 140,
+      "cell_id": "2728387db741",
+      "unchanged": false,
+      "before": "del X_train, y_train, X_va, y_va, X_cv, y_cv, y_cv_array, val_scores\ngc.collect()\n",
+      "after": "del X_train, y_train, X_cv, y_cv, y_cv_array, val_scores\ngc.collect()\n",
+      "change_type": "fix_duplicate_cleanup"
+    },
+    {
+      "source_cell_index": 141,
+      "cell_id": "fe84c2d7",
+      "unchanged": false,
+      "before": "del X_va, y_va, dval, dtrain; gc.collect()\nX_te, y_te = load('test')\nprint(f'Test: {X_te.shape[0]:,} dòng | fraud {y_te.mean():.2%}')\n\np_lr = lr.predict_proba(X_te)[:, 1]\np_gb = booster.predict(X_te, num_iteration=booster.best_iteration)\nevaluate('LR · Test', y_te, p_lr, thr_lr)\nevaluate('LightGBM · Test', y_te, p_gb, thr_gb);",
+      "after": "if RUN_FINAL_TEST:\n    del X_va, y_va, dval, dtrain; gc.collect()\n    X_te, y_te = load('test')\n    print(f'Test: {X_te.shape[0]:,} dòng | fraud {y_te.mean():.2%}')\n    \n    p_lr = lr.predict_proba(X_te)[:, 1]\n    p_gb = booster.predict(X_te, num_iteration=booster.best_iteration)\n    evaluate('LR · Test', y_te, p_lr, thr_lr)\n    evaluate('LightGBM · Test', y_te, p_gb, thr_gb);\n",
+      "change_type": "gate_final_test"
+    },
+    {
+      "source_cell_index": 142,
+      "cell_id": "iHlPxGWOyVEQ",
+      "unchanged": true,
+      "before": "order = ['PR-AUC', 'ROC-AUC', 'Precision', 'Recall', 'F1', 'Ngưỡng', 'TP', 'FP', 'FN']\nfmt = {c: '{:.4f}' for c in order[:6]}\nfmt.update({c: '{:,.0f}' for c in ['TP', 'FP', 'FN']})\nsummary = pd.DataFrame(RESULTS).T[order]\ndisplay(summary.style.format(fmt).background_gradient(subset=['PR-AUC', 'F1'], cmap='Blues')\n        .set_caption('So sánh các mô hình (PR-AUC là chỉ số chính)'))",
+      "after": "order = ['PR-AUC', 'ROC-AUC', 'Precision', 'Recall', 'F1', 'Ngưỡng', 'TP', 'FP', 'FN']\nfmt = {c: '{:.4f}' for c in order[:6]}\nfmt.update({c: '{:,.0f}' for c in ['TP', 'FP', 'FN']})\nsummary = pd.DataFrame(RESULTS).T[order]\ndisplay(summary.style.format(fmt).background_gradient(subset=['PR-AUC', 'F1'], cmap='Blues')\n        .set_caption('So sánh các mô hình (PR-AUC là chỉ số chính)'))"
+    },
+    {
+      "source_cell_index": 143,
+      "cell_id": "D1eqC2NSz3_0",
+      "unchanged": false,
+      "before": "# Precision-recall\ncolors = {'LR · Test': '#4C78A8', 'LightGBM · Test': '#F58518'}\n\nfig, ax = plt.subplots(figsize=(11, 5))\nfor name, p in [('LR · Test', p_lr), ('LightGBM · Test', p_gb)]:\n    pr, rc, _ = precision_recall_curve(y_te, p); r = RESULTS[name]\n    ax.plot(rc, pr, lw=2, color=colors[name], label=f\"{name.split(' · ')[0]} (PR-AUC {r['PR-AUC']:.3f})\")\n    ax.scatter(r['Recall'], r['Precision'], s=70, color=colors[name], edgecolor='k', zorder=3)\nax.axhline(y_te.mean(), ls='--', c='gray', lw=1, label=f'Ngẫu nhiên ({y_te.mean():.2%})')\nax.set(title='Precision–Recall (Test)  |  ● = ngưỡng chọn trên Validation', xlabel='Recall',\n       ylabel='Precision', xlim=(0, 1), ylim=(0, 1.02))\nax.legend(loc='upper right'); plt.tight_layout(); plt.show()",
+      "after": "if RUN_FINAL_TEST:\n    # Precision-recall\n    colors = {'LR · Test': '#4C78A8', 'LightGBM · Test': '#F58518'}\n    \n    fig, ax = plt.subplots(figsize=(11, 5))\n    for name, p in [('LR · Test', p_lr), ('LightGBM · Test', p_gb)]:\n        pr, rc, _ = precision_recall_curve(y_te, p); r = RESULTS[name]\n        ax.plot(rc, pr, lw=2, color=colors[name], label=f\"{name.split(' · ')[0]} (PR-AUC {r['PR-AUC']:.3f})\")\n        ax.scatter(r['Recall'], r['Precision'], s=70, color=colors[name], edgecolor='k', zorder=3)\n    ax.axhline(y_te.mean(), ls='--', c='gray', lw=1, label=f'Ngẫu nhiên ({y_te.mean():.2%})')\n    ax.set(title='Precision–Recall (Test)  |  ● = ngưỡng chọn trên Validation', xlabel='Recall',\n           ylabel='Precision', xlim=(0, 1), ylim=(0, 1.02))\n    ax.legend(loc='upper right'); plt.tight_layout(); plt.show()\n",
+      "change_type": "gate_final_test"
+    },
+    {
+      "source_cell_index": 144,
+      "cell_id": "SupnT2pcz8tb",
+      "unchanged": false,
+      "before": "# Confusion matrix\nr = RESULTS['LightGBM · Test']\ncm = np.array([[r['TN'], r['FP']], [r['FN'], r['TP']]]); cmn = cm / cm.sum(1, keepdims=True)\n\nfig, ax = plt.subplots(figsize=(7, 5))\nax.imshow(cmn, cmap='Blues', vmin=0, vmax=1); ax.grid(False)\nfor i in range(2):\n    for j in range(2):\n        ax.text(j, i, f'{cm[i, j]:,.0f}\\n({cmn[i, j]:.1%})', ha='center', va='center',\n                color='white' if cmn[i, j] > .5 else 'black', fontsize=12)\nax.set(title='Ma trận nhầm lẫn — LightGBM (Test)', xticks=[0, 1], yticks=[0, 1],\n       xticklabels=['Dự đoán thường', 'Dự đoán fraud'], yticklabels=['Thực tế thường', 'Thực tế fraud'])\nplt.tight_layout(); plt.show()",
+      "after": "if RUN_FINAL_TEST:\n    # Confusion matrix\n    r = RESULTS['LightGBM · Test']\n    cm = np.array([[r['TN'], r['FP']], [r['FN'], r['TP']]]); cmn = cm / cm.sum(1, keepdims=True)\n    \n    fig, ax = plt.subplots(figsize=(7, 5))\n    ax.imshow(cmn, cmap='Blues', vmin=0, vmax=1); ax.grid(False)\n    for i in range(2):\n        for j in range(2):\n            ax.text(j, i, f'{cm[i, j]:,.0f}\\n({cmn[i, j]:.1%})', ha='center', va='center',\n                    color='white' if cmn[i, j] > .5 else 'black', fontsize=12)\n    ax.set(title='Ma trận nhầm lẫn — LightGBM (Test)', xticks=[0, 1], yticks=[0, 1],\n           xticklabels=['Dự đoán thường', 'Dự đoán fraud'], yticklabels=['Thực tế thường', 'Thực tế fraud'])\n    plt.tight_layout(); plt.show()\n",
+      "change_type": "gate_final_test"
+    },
+    {
+      "source_cell_index": 145,
+      "cell_id": "zEu2WEQ10B2E",
+      "unchanged": true,
+      "before": "# top 10 features\ngain = pd.Series(booster.feature_importance('gain'), index=FEATURES)\ngain = (gain / gain.sum() * 100).nlargest(10).sort_values()\n\nfig, ax = plt.subplots(figsize=(11, 5))\ngain.plot.barh(ax=ax, color='#F58518')\nfor k, v in enumerate(gain):\n    ax.text(v + .5, k, f'{v:.1f}%', va='center')\nax.set(title='Top 10 feature — LightGBM', xlabel='% tổng gain', xlim=(0, gain.max() * 1.15))\nplt.tight_layout(); plt.show()",
+      "after": "# top 10 features\ngain = pd.Series(booster.feature_importance('gain'), index=FEATURES)\ngain = (gain / gain.sum() * 100).nlargest(10).sort_values()\n\nfig, ax = plt.subplots(figsize=(11, 5))\ngain.plot.barh(ax=ax, color='#F58518')\nfor k, v in enumerate(gain):\n    ax.text(v + .5, k, f'{v:.1f}%', va='center')\nax.set(title='Top 10 feature — LightGBM', xlabel='% tổng gain', xlim=(0, gain.max() * 1.15))\nplt.tight_layout(); plt.show()"
+    }
+  ],
+  "approved_lightgbm": {
+    "num_leaves": 31,
+    "min_data_in_leaf": 300,
+    "neg_bagging_fraction": 0.5,
+    "lambda_l2": 1.0,
+    "num_boost_round": 800,
+    "early_stopping_rounds": 50,
+    "num_threads": 4
+  }
+}

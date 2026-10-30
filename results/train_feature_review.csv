@@ -1,0 +1,45 @@
+,column,group,description,default_model_use
+0,ssn,Identifiers,Customer identifier; exact semantics unverified,Excluded; retained in train EDA
+1,cc_num,Identifiers,Payment card identifier; preserve precision,Excluded; retained in train EDA
+2,first,Identifiers,Given name,Excluded; retained in train EDA
+3,last,Identifiers,Family name,Excluded; retained in train EDA
+4,gender,Customer,Recorded gender; source definitions unverified,Excluded; retained in train EDA
+5,street,Identifiers,Street address,Excluded; retained in train EDA
+6,city,Customer,Customer city,Excluded; retained in train EDA
+7,state,Customer,Recorded state/region,training-vocabulary one-hot
+8,zip,Identifiers,Postal code; raw leading zeros may already be absent,Excluded; retained in train EDA
+9,lat,Customer,"Customer latitude, interpreted from column name",distance_km
+10,long,Customer,"Customer longitude, interpreted from column name",distance_km
+11,city_pop,Customer,City population; reference date unknown,log_city_pop
+12,job,Customer,Occupation; high cardinality and source-dependent,Excluded; retained in train EDA
+13,dob,Customer,Birth date; derive age at the event date,age at transaction
+14,acct_num,Identifiers,Account identifier,Excluded; retained in train EDA
+15,profile,Customer,Profile code; provenance unverified,Excluded; retained in train EDA
+16,trans_num,Identifiers,Transaction key used for integrity checks and split tie-breaking,Excluded; retained in train EDA
+17,trans_date,Transaction,Source event date; timezone unverified,"split, age and weekday"
+18,trans_time,Transaction,Source event clock time; timezone unverified,split and cyclic hour
+19,unix_time,Transaction,Epoch timestamp; compare with source clock time,Excluded; retained in train EDA
+20,category,Transaction,Transaction category,Excluded; retained in train EDA
+21,amt,Transaction,Transaction amount; preserve large positive values,log_amount only
+22,is_fraud,Transaction,Prediction target,Target only
+23,merchant,Merchant,Merchant name; not a reliable unique merchant ID,Excluded; retained in train EDA
+24,merch_lat,Merchant,Merchant latitude,distance_km
+25,merch_long,Merchant,Merchant longitude,distance_km
+26,customer_num_trans_1_day,Customer history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+27,customer_num_trans_7_day,Customer history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+28,customer_num_trans_30_day,Customer history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+29,trans_time_secs,Supplied time features,Precomputed time field; verify against source time,Excluded; retained in train EDA
+30,trans_time_hrs,Supplied time features,Precomputed hour; verify against source time,Excluded; retained in train EDA
+31,trans_time_is_night,Supplied time features,Supplied night flag; source rule unknown,Excluded; retained in train EDA
+32,trans_time_day,Supplied time features,Precomputed weekday,Excluded; retained in train EDA
+33,trans_date_is_weekend,Supplied time features,Precomputed weekend flag,Excluded; retained in train EDA
+34,customer_avg_amout_1_day,Customer history,Historical average amount; aggregation definition unverified,Excluded; retained in train EDA
+35,customer_avg_amount_7_day,Customer history,Historical average amount; aggregation definition unverified,Excluded; retained in train EDA
+36,customer_avg_amount_30_day,Customer history,Historical average amount; aggregation definition unverified,Excluded; retained in train EDA
+37,merchant_num_trans_1_day,Merchant history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+38,merchant_num_trans_7_day,Merchant history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+39,merchant_num_trans_30_day,Merchant history,Historical transaction count suggested by name; verify fractional values,Excluded; retained in train EDA
+40,merchant_risk_1_day,Merchant history,Merchant historical risk; formula and label availability unverified,Excluded; retained in train EDA
+41,merchant_risk_7_day,Merchant history,Merchant historical risk; formula and label availability unverified,Excluded; retained in train EDA
+42,merchant_risk_30_day,Merchant history,Merchant historical risk; formula and label availability unverified,Excluded; retained in train EDA
+43,merchant_risk_90_day,Merchant history,Merchant historical risk; formula and label availability unverified,Excluded; retained in train EDA

@@ -1,0 +1,19 @@
+# Large source/prepared data and runtime artifacts
+/data/raw/*
+!/data/raw/README.md
+/data/processed/
+*.parquet
+*.joblib
+*.pkl
+*.pickle
+*.zip
+*.zip.part*
+# Local environments, credentials and notebook checkpoints
+.venv/
+venv/
+__pycache__/
+.ipynb_checkpoints/
+.env
+.env.*
+.DS_Store
+*.log

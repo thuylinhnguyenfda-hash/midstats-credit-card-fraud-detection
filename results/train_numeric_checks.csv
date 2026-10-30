@@ -1,0 +1,11 @@
+,0
+invalid_target,0
+negative_amount,0
+invalid_customer_lat,0
+invalid_customer_long,0
+invalid_merchant_lat,0
+invalid_merchant_long,0
+customer_count_1d_gt_7d,0
+customer_count_7d_gt_30d,0
+merchant_count_1d_gt_7d,90747
+merchant_count_7d_gt_30d,205945
