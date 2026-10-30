@@ -14,7 +14,7 @@ The layout follows the provided Stock_META_Thien sample:
 3. Compare the models
 4. Conclusions
 
-[Open the current review notebook in Colab]([https://colab.research.google.com/drive/125VXyel4u8uoJW-5VJ9eCOM-D8O0_N5m](https://colab.research.google.com/drive/1V-CkMfJm2Il9-eJhni-n1nrAPncW5XWe))
+[Open the current review notebook in Colab]([(https://colab.research.google.com/drive/1V-CkMfJm2Il9-eJhni-n1nrAPncW5XWe)])
 
 
 ## Reproduce locally
